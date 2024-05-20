@@ -1,22 +1,32 @@
 let currentIndex = 0;
-let pi = "3."; // Initial pi value
-let piApproximation = 0;
-let denominator = 1;
-let sign = 1;
+let piDigits = "3."; // Initial π value
+let k = 0;
 
 function calculateNextPiDigit() {
-    // Leibniz formula for π: π = 4 * (1 - 1/3 + 1/5 - 1/7 + 1/9 - ...)
-    piApproximation += (4 / denominator) * sign;
-    denominator += 2;
-    sign *= -1;
-    
-    let piString = piApproximation.toString().replace(".", "").slice(0, currentIndex + 1);
-    if (piString.length > 4) {
-        piString = piString.slice(piString.length - 4);
+    // Bailey-Borwein-Plouffe (BBP) formula for π
+    let pi = 0;
+    for (let i = 0; i <= k; i++) {
+        pi += (1 / Math.pow(16, i)) * (
+            (4 / (8 * i + 1)) -
+            (2 / (8 * i + 4)) -
+            (1 / (8 * i + 5)) -
+            (1 / (8 * i + 6))
+        );
     }
-    document.getElementById('number-display').innerText = piString;
-    
-    currentIndex++;
+
+    let piString = pi.toString().replace(".", "");
+    let newDigit = piString[currentIndex + 1]; // +1 to skip "3."
+    if (newDigit !== undefined) {
+        piDigits += newDigit;
+        currentIndex++;
+
+        if (piDigits.length > 6) { // "3." + 4 digits
+            piDigits = "3." + piDigits.slice(piDigits.length - 4);
+        }
+
+        document.getElementById('number-display').innerText = piDigits;
+    }
+    k++;
 }
 
 setInterval(calculateNextPiDigit, 1000); // Update the number every second
